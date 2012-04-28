@@ -21,26 +21,23 @@ void Lane::transport() {
     Station& source = (direction) ? this->stationLower : this->stationUpper;
     Station& target = (direction) ? this->stationUpper : this->stationLower;
 
-    // calculate rock amount to transport
-    // TODO use more complicated calculation here
-    Real transportedAmount = log(sqrt(source.getRockAmount() / 2));
+    // calculate power consuming
+    Real powerConsumption = log(sqrt(source.getRockAmount() / 2));
+    this->consumedPower += powerConsumption;
 
     // transport rock amount
     source.setRockAmount(
-        source.getRockAmount() - transportedAmount
+        source.getRockAmount() - 1
     );
 
     target.setRockAmount(
-        target.getRockAmount() + transportedAmount
+        target.getRockAmount() + 1
     );
 
     // switch bogies
     int tmpBogieId = source.getBogieId();
     source.setBogieId(target.getBogieId());
     target.setBogieId(tmpBogieId);
-
-    // calculate power consuming
-    this->consumedPower += transportedAmount;
 }
 
 }   // namespace
