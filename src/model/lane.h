@@ -10,7 +10,7 @@ namespace Model {
 using ::Model::DirectionFactory::IDirectionFactory;
 
 class Lane {
-private:
+protected:
     Real consumedPower;
     Station& stationLower;
     Station& stationUpper;

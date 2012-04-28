@@ -13,12 +13,14 @@
 #include "model/mine.hpp"
 #include "model/station.h"
 #include "model/lane.h"
+#include "model/criticalLane.h"
 #include "model/direction_factory/always_up.h"
 #include "model/solution_result.h"
 
 using Model::Mine;
 using Model::Station;
 using Model::Lane;
+using Model::CriticalLane;
 using Model::SolutionResult;
 
 using Model::DirectionFactory::AlwaysUp;
@@ -87,6 +89,39 @@ SolutionResult solutionTrivialParallel() {
     return result;
 }
 
+SolutionResult solutionCriticalParallel() {
+    AlwaysUp directionFactory;
+    Mine<Station, CriticalLane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
+    SolutionResult result(STATION_COUNT, LANE_COUNT);
+
+    result.startComputing();
+
+    int i;
+    #pragma omp parallel for default(none) shared(mine) private(i)
+    for (i = 0; i < BOGIE_SWITCH_COUNT; i++) {
+        mine.getLaneAt(i%LANE_COUNT).transport();
+    }
+
+    result.stopComputing();
+
+    for (int i = 0; i < STATION_COUNT; i++) {
+        result.setStationResultAt(
+            i,
+            mine.getStationAt(i).getBogieId(),
+            mine.getStationAt(i).getRockAmount()
+        );
+    }
+
+    for (int i = 0; i < LANE_COUNT; i++) {
+        result.setLaneResultAt(
+            i,
+            mine.getLaneAt(i).getConsumedPower()
+        );
+    }
+
+    return result;
+}
+
 int main(void) {
 	SolutionResult trivialResult = solutionTrivial();
 	if (trivialResult.isValid()) {
@@ -96,6 +131,7 @@ int main(void) {
 	}
 	printf(" trivial time: %f sec\n", trivialResult.getComputingTime());
 
+
 	SolutionResult trivialParallelResult = solutionTrivialParallel();
 	if (trivialParallelResult.isValid()) {
 	    printf("[PASSED]");
@@ -103,6 +139,15 @@ int main(void) {
 	    printf("[FAILED]");
 	}
 	printf(" trivial parallel time: %f sec\n", trivialParallelResult.getComputingTime());
+
+
+    SolutionResult criticalParallelResult = solutionCriticalParallel();
+    if (criticalParallelResult.isValid()) {
+        printf("[PASSED]");
+    } else {
+        printf("[FAILED]");
+    }
+    printf(" critical parallel time: %f sec\n", criticalParallelResult.getComputingTime());
 
 	return EXIT_SUCCESS;
 }
