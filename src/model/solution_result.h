@@ -33,6 +33,7 @@ public:
     void setLaneResultAt(int index, Real consumedPower);
 
     bool equalsTo(SolutionResult& compared);
+    bool isValid();
 
     void print();
 

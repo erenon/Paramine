@@ -23,11 +23,6 @@ using Model::SolutionResult;
 
 using Model::DirectionFactory::AlwaysUp;
 
-#define STATION_COUNT 5
-#define LANE_COUNT 4
-#define BOGIE_SWITCH_COUNT 50000000
-#define ROCK_AMOUNT 500000000
-
 SolutionResult solutionTrivial() {
     AlwaysUp directionFactory;
     Mine<Station, Lane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
@@ -96,9 +91,11 @@ int main(void) {
 	SolutionResult trivialResult = solutionTrivial();
 	printf("[REFERENCE] trivial time: %f sec\n", trivialResult.getComputingTime());
 	//trivialResult.print();
+	trivialResult.isValid();
 
 	SolutionResult trivialParallelResult = solutionTrivialParallel();
-	if (trivialResult.equalsTo(trivialParallelResult)) {
+	//if (trivialResult.equalsTo(trivialParallelResult)) {
+	if (trivialParallelResult.isValid()) {
 	    printf("[PASSED] trivial parallel time: %f sec\n", trivialParallelResult.getComputingTime());
 	} else {
 	    printf("[FAILED] trivial parallel time: %f sec\n", trivialParallelResult.getComputingTime());

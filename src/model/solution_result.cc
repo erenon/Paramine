@@ -75,6 +75,54 @@ bool SolutionResult::equalsTo(SolutionResult& compared) {
     return true;
 }
 
+/**
+ * Returns true, if the solution satisfies the followings:
+ * - No negative rock amount on station
+ * - No duplicated bogie id
+ * - Sum of rock amounts equals to total rock amount
+ */
+bool SolutionResult::isValid() {
+    // check for negative rock amount
+    // and calculate rock sum
+    Real rockAmountSum = 0;
+
+    for (int i = 0; i < this->stationCount; i++) {
+        if (this->rockAmounts[i] < 0) {
+            fprintf(stderr, "Negative rock amount found at station #%d", i);
+            return false;
+        }
+
+        rockAmountSum += this->rockAmounts[i];
+    }
+
+    // cast constants to Real to prevent integer overflow
+    if (rockAmountSum != (Real)STATION_COUNT * (Real)ROCK_AMOUNT) {
+        fprintf(stderr, "Total rock amount mismatch");
+        return false;
+    }
+
+    // check bogie ids
+    bool *occurredBogieIds = new bool[this->laneCount];
+    for (int i = 0; i < this->laneCount; i++) {
+        occurredBogieIds[i] = false;
+    }
+
+
+    for (int i = 0; i < this->laneCount; i++) {
+        int bogieId = this->bogieIds[i];
+        if (occurredBogieIds[bogieId] == true) {
+            // id already occurred, invalid solution
+            fprintf(stderr, "Bogie id #%d occurred twice", i);
+            return false;
+        } else {
+            occurredBogieIds[bogieId] = true;
+        }
+    }
+
+    // no errors found
+    return true;
+}
+
 void SolutionResult::print() {
     double timeConsumed = this->getComputingTime();
     if (timeConsumed >= 0) {
