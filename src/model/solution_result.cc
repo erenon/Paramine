@@ -18,19 +18,15 @@ SolutionResult::SolutionResult(int stationCount, int laneCount)
 }
 
 void SolutionResult::startComputing() {
-    this->computingStarted = clock();
+    this->computingStarted = time(NULL);
 }
 
 void SolutionResult::stopComputing() {
-    this->computingStopped = clock();
+    this->computingStopped = time(NULL);
 }
 
 double SolutionResult::getComputingTime() {
-    if (this->computingStarted != -1 && this->computingStopped != -1) {
-        return (this->computingStopped - this->computingStarted) / CLOCKS_PER_SEC;
-    } else {
-        return -1;
-    }
+    return difftime(this->computingStopped, this->computingStarted);
 }
 
 void SolutionResult::setStationResultAt(int index, int bogieId, Real rockAmount) {

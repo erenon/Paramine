@@ -94,14 +94,14 @@ SolutionResult solutionTrivialParallel() {
 
 int main(void) {
 	SolutionResult trivialResult = solutionTrivial();
-	printf("[REFERENCE] trivial time: %f\n", trivialResult.getComputingTime());
+	printf("[REFERENCE] trivial time: %f sec\n", trivialResult.getComputingTime());
 	//trivialResult.print();
 
 	SolutionResult trivialParallelResult = solutionTrivialParallel();
 	if (trivialResult.equalsTo(trivialParallelResult)) {
-	    printf("[PASSED] trivial parallel time: %f\n", trivialParallelResult.getComputingTime());
+	    printf("[PASSED] trivial parallel time: %f sec\n", trivialParallelResult.getComputingTime());
 	} else {
-	    printf("[FAILED] trivial parallel time: %f\n", trivialParallelResult.getComputingTime());
+	    printf("[FAILED] trivial parallel time: %f sec\n", trivialParallelResult.getComputingTime());
 	}
 
 	return EXIT_SUCCESS;

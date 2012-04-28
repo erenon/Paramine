@@ -19,9 +19,8 @@ private:
     // lane parameters
     Real* consumedPowers;
 
-    // timer attributes
-    clock_t computingStarted;
-    clock_t computingStopped;
+    time_t computingStarted;
+    time_t computingStopped;
 
 public:
     SolutionResult(int stationCount, int laneCount);
