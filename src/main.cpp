@@ -122,32 +122,60 @@ SolutionResult solutionCriticalParallel() {
     return result;
 }
 
-int main(void) {
-	SolutionResult trivialResult = solutionTrivial();
-	if (trivialResult.isValid()) {
-	    printf("[PASSED]");
-	} else {
-	    printf("[FAILED]");
-	}
-	printf(" trivial time: %f sec\n", trivialResult.getComputingTime());
+SolutionResult solutionCriticalParallelCircular() {
+    AlwaysUp directionFactory;
+    int laneCount = LANE_COUNT + 1; // circular topology
+    Mine<Station, CriticalLane> mine(STATION_COUNT, laneCount, ROCK_AMOUNT, directionFactory);
+    SolutionResult result(STATION_COUNT, laneCount);
 
+    result.startComputing();
 
-	SolutionResult trivialParallelResult = solutionTrivialParallel();
-	if (trivialParallelResult.isValid()) {
-	    printf("[PASSED]");
-	} else {
-	    printf("[FAILED]");
-	}
-	printf(" trivial parallel time: %f sec\n", trivialParallelResult.getComputingTime());
-
-
-    SolutionResult criticalParallelResult = solutionCriticalParallel();
-    if (criticalParallelResult.isValid()) {
-        printf("[PASSED]");
-    } else {
-        printf("[FAILED]");
+    int i;
+    #pragma omp parallel for default(none) shared(mine, laneCount) private(i)
+    for (i = 0; i < BOGIE_SWITCH_COUNT; i++) {
+        mine.getLaneAt(i%laneCount).transport();
     }
-    printf(" critical parallel time: %f sec\n", criticalParallelResult.getComputingTime());
+
+    result.stopComputing();
+
+    for (int i = 0; i < STATION_COUNT; i++) {
+        result.setStationResultAt(
+            i,
+            mine.getStationAt(i).getBogieId(),
+            mine.getStationAt(i).getRockAmount()
+        );
+    }
+
+    for (int i = 0; i < laneCount; i++) {
+        result.setLaneResultAt(
+            i,
+            mine.getLaneAt(i).getConsumedPower()
+        );
+    }
+
+    return result;
+}
+
+void runSolution(SolutionResult(*solution)()) {
+    SolutionResult result = solution();
+    if (result.isValid()) {
+        printf("[PASSED] ");
+    } else {
+        printf("[FAILED] ");
+        fprintf(stdout, "%s\n", result.getValidationError().c_str());
+    }
+    printf("time: %f sec\n", result.getComputingTime());
+}
+
+int main(void) {
+    printf("Trivial Solution:\n");
+    runSolution(solutionTrivial);
+    printf("Trivial Parallel Solution:\n");
+    runSolution(solutionTrivialParallel);
+    printf("Parallel Solution with critical section:\n");
+    runSolution(solutionCriticalParallel);
+    printf("Parallel Solution with critical section and circular mine:\n");
+    runSolution(solutionCriticalParallelCircular);
 
 	return EXIT_SUCCESS;
 }

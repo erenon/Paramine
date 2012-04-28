@@ -88,7 +88,8 @@ bool SolutionResult::isValid() {
 
     for (int i = 0; i < this->stationCount; i++) {
         if (this->rockAmounts[i] < 0) {
-            fprintf(stderr, "Negative rock amount found at station #%d", i);
+            //fprintf(stderr, "Negative rock amount found at station #%d", i);
+            this->validationError = "Negative rock amount found";
             return false;
         }
 
@@ -97,7 +98,8 @@ bool SolutionResult::isValid() {
 
     // cast constants to Real to prevent integer overflow
     if (rockAmountSum != (Real)STATION_COUNT * (Real)ROCK_AMOUNT) {
-        fprintf(stderr, "Total rock amount mismatch");
+        //fprintf(stderr, "Total rock amount mismatch");
+        this->validationError = "Total rock amount mismatch";
         return false;
     }
 
@@ -112,7 +114,8 @@ bool SolutionResult::isValid() {
         int bogieId = this->bogieIds[i];
         if (occurredBogieIds[bogieId] == true) {
             // id already occurred, invalid solution
-            fprintf(stderr, "Bogie id #%d occurred twice", i);
+            //fprintf(stderr, "Bogie id #%d occurred twice", i);
+            this->validationError = "Duplicated bogie id";
             return false;
         } else {
             occurredBogieIds[bogieId] = true;
@@ -121,6 +124,10 @@ bool SolutionResult::isValid() {
 
     // no errors found
     return true;
+}
+
+string SolutionResult::getValidationError() {
+    return validationError;
 }
 
 void SolutionResult::print() {

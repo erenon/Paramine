@@ -2,10 +2,13 @@
 #define SRC_MODEL_SOLUTION_RESULT_H_
 
 #include <ctime>
+#include <string>
 
 #include "constants.h"
 
 namespace Model {
+
+using std::string;
 
 class SolutionResult {
 private:
@@ -22,6 +25,8 @@ private:
     time_t computingStarted;
     time_t computingStopped;
 
+    string validationError;
+
 public:
     SolutionResult(int stationCount, int laneCount);
 
@@ -34,6 +39,7 @@ public:
 
     bool equalsTo(SolutionResult& compared);
     bool isValid();
+    string getValidationError();
 
     void print();
 
