@@ -10,7 +10,9 @@ using Model::DirectionFactory::Random;
 // No more threads allowed
 #define MAX_THREAD_COUNT 16
 
-typedef float Real;
+//typedef float Real;
+typedef double Real;
+
 //typedef AlwaysUp DirFac;
 typedef Random DirFac;
 
