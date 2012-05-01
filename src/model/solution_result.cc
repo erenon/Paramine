@@ -104,13 +104,13 @@ bool SolutionResult::isValid() {
     }
 
     // check bogie ids
-    bool *occurredBogieIds = new bool[this->laneCount];
-    for (int i = 0; i < this->laneCount; i++) {
+    bool *occurredBogieIds = new bool[this->stationCount];
+    for (int i = 0; i < this->stationCount; i++) {
         occurredBogieIds[i] = false;
     }
 
 
-    for (int i = 0; i < this->laneCount; i++) {
+    for (int i = 0; i < this->stationCount; i++) {
         int bogieId = this->bogieIds[i];
         if (occurredBogieIds[bogieId] == true) {
             // id already occurred, invalid solution
