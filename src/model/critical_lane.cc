@@ -1,4 +1,4 @@
-#include "criticalLane.h"
+#include "critical_lane.h"
 
 #include <cmath>
 
