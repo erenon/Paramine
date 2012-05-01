@@ -20,8 +20,10 @@ public:
     Real getRockAmount() const;
     void setRockAmount(Real rockAmount);
 
-    void incrementRockAmount();
-    void decrementRockAmount();
+    virtual void incrementRockAmount();
+    virtual void decrementRockAmount();
+
+    virtual ~Station() {};
 };
 
 }    // namespace
