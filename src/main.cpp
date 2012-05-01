@@ -13,13 +13,17 @@
 #include "model/mine.hpp"
 #include "model/station.h"
 #include "model/lane.h"
-#include "model/criticalLane.h"
+#include "model/atomic_station.h"
+#include "model/atomic_lane.h"
+#include "model/critical_lane.h"
 #include "model/direction_factory/always_up.h"
 #include "model/solution_result.h"
 
 using Model::Mine;
 using Model::Station;
 using Model::Lane;
+using Model::AtomicStation;
+using Model::AtomicLane;
 using Model::CriticalLane;
 using Model::SolutionResult;
 
@@ -32,7 +36,7 @@ SolutionResult solutionTrivial() {
 
     result.startComputing();
 
-    for (int i = 0; i < BOGIE_SWITCH_COUNT; i++) {
+    for (int i = 0; i < TOTAL_SWITCH_COUNT; i++) {
         mine.getLaneAt(i%LANE_COUNT).transport();
     }
 
@@ -65,7 +69,40 @@ SolutionResult solutionTrivialParallel() {
 
     int i;
     #pragma omp parallel for default(none) shared(mine) private(i)
-    for (i = 0; i < BOGIE_SWITCH_COUNT; i++) {
+    for (i = 0; i < TOTAL_SWITCH_COUNT; i++) {
+        mine.getLaneAt(i%LANE_COUNT).transport();
+    }
+
+    result.stopComputing();
+
+    for (int i = 0; i < STATION_COUNT; i++) {
+        result.setStationResultAt(
+            i,
+            mine.getStationAt(i).getBogieId(),
+            mine.getStationAt(i).getRockAmount()
+        );
+    }
+
+    for (int i = 0; i < LANE_COUNT; i++) {
+        result.setLaneResultAt(
+            i,
+            mine.getLaneAt(i).getConsumedPower()
+        );
+    }
+
+    return result;
+}
+
+SolutionResult solutionAtomicParallel() {
+    AlwaysUp directionFactory;
+    Mine<AtomicStation, AtomicLane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
+    SolutionResult result(STATION_COUNT, LANE_COUNT);
+
+    result.startComputing();
+
+    int i;
+    #pragma omp parallel for default(none) shared(mine) private(i)
+    for (i = 0; i < TOTAL_SWITCH_COUNT; i++) {
         mine.getLaneAt(i%LANE_COUNT).transport();
     }
 
@@ -98,7 +135,7 @@ SolutionResult solutionCriticalParallel() {
 
     int i;
     #pragma omp parallel for default(none) shared(mine) private(i)
-    for (i = 0; i < BOGIE_SWITCH_COUNT; i++) {
+    for (i = 0; i < TOTAL_SWITCH_COUNT; i++) {
         mine.getLaneAt(i%LANE_COUNT).transport();
     }
 
@@ -132,7 +169,7 @@ SolutionResult solutionCriticalParallelCircular() {
 
     int i;
     #pragma omp parallel for default(none) shared(mine, laneCount) private(i)
-    for (i = 0; i < BOGIE_SWITCH_COUNT; i++) {
+    for (i = 0; i < TOTAL_SWITCH_COUNT; i++) {
         mine.getLaneAt(i%laneCount).transport();
     }
 
@@ -156,15 +193,63 @@ SolutionResult solutionCriticalParallelCircular() {
     return result;
 }
 
+SolutionResult solutionCombParallel() {
+    AlwaysUp directionFactory;
+    Mine<Station, Lane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
+    SolutionResult result(STATION_COUNT, LANE_COUNT);
+
+    result.startComputing();
+
+    int i, j;
+    int threadId;
+    int jumpDelta;
+    #pragma omp parallel shared(mine, jumpDelta) private(i, j, threadId)
+    {
+        threadId = omp_get_thread_num();
+        jumpDelta = omp_get_num_threads() * 2;
+        for (i = threadId * 2; i < LANE_COUNT; i += jumpDelta) {
+            for (j = 0; j < BOGIE_SWITCH_COUNT; j++) {
+                mine.getLaneAt(i).transport();
+            }
+        }
+
+        #pragma omp barrier
+        for (i = threadId * 2 + 1; i < LANE_COUNT; i += jumpDelta) {
+            for (j = 0; j < BOGIE_SWITCH_COUNT; j++) {
+                mine.getLaneAt(i).transport();
+            }
+        }
+    }
+
+    result.stopComputing();
+
+    for (int i = 0; i < STATION_COUNT; i++) {
+        result.setStationResultAt(
+            i,
+            mine.getStationAt(i).getBogieId(),
+            mine.getStationAt(i).getRockAmount()
+        );
+    }
+
+    for (int i = 0; i < LANE_COUNT; i++) {
+        result.setLaneResultAt(
+            i,
+            mine.getLaneAt(i).getConsumedPower()
+        );
+    }
+
+    return result;
+}
+
 void runSolution(SolutionResult(*solution)()) {
     SolutionResult result = solution();
     if (result.isValid()) {
-        printf("[PASSED] ");
+        printf("[PASSED]\n");
     } else {
         printf("[FAILED] ");
         fprintf(stdout, "%s\n", result.getValidationError().c_str());
     }
-    printf("time: %f sec\n", result.getComputingTime());
+    printf("time: %f sec\n\n", result.getComputingTime());
 }
 
 int main(void) {
@@ -172,10 +257,14 @@ int main(void) {
     runSolution(solutionTrivial);
     printf("Trivial Parallel Solution:\n");
     runSolution(solutionTrivialParallel);
+    printf("Atomic Parallel Solution:\n");
+    runSolution(solutionAtomicParallel);
     printf("Parallel Solution with critical section:\n");
     runSolution(solutionCriticalParallel);
     printf("Parallel Solution with critical section and circular mine:\n");
     runSolution(solutionCriticalParallelCircular);
+    printf("Parallel Comb Solution:\n");
+    runSolution(solutionCombParallel);
 
 	return EXIT_SUCCESS;
 }
