@@ -7,13 +7,15 @@
 using Model::DirectionFactory::AlwaysUp;
 using Model::DirectionFactory::Random;
 
+// No more threads allowed
+#define MAX_THREAD_COUNT 16
+
 typedef float Real;
 //typedef AlwaysUp DirFac;
 typedef Random DirFac;
 
 #define STATION_COUNT 5
 #define LANE_COUNT 4
-
 
 #define BOGIE_SWITCH_COUNT 10000000
 // Faster execution to ease the testing
