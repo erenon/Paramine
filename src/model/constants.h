@@ -6,16 +6,19 @@ typedef float Real;
 #define STATION_COUNT 5
 #define LANE_COUNT 4
 
+
+#define BOGIE_SWITCH_COUNT 10000000
+// Faster execution to ease the testing
+//#define BOGIE_SWITCH_COUNT 250000
+
 /*
- * Total switch count in the mine
- * equals to M * LANE_COUNT
+ * Total count of bogie switches in the mine
  */
-#define BOGIE_SWITCH_COUNT 40000000
+#define TOTAL_SWITCH_COUNT (BOGIE_SWITCH_COUNT * LANE_COUNT)
 
 /**
  * Initial rock amount on each station
- * equals to M * 10
  */
-#define ROCK_AMOUNT 100000000
+#define ROCK_AMOUNT (BOGIE_SWITCH_COUNT * 10)
 
 #endif /* SRC_MODEL_CONSTANTS_H_ */
