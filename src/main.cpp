@@ -250,19 +250,31 @@ void runSolution(SolutionResult(*solution)()) {
         fprintf(stdout, "%s\n", result.getValidationError().c_str());
     }
     printf("time: %f sec\n\n", result.getComputingTime());
+
+    result.print();
 }
 
 int main(void) {
     printf("Trivial Solution:\n");
     runSolution(solutionTrivial);
+
+    printf("\n+-----------------------------+\n");
     printf("Trivial Parallel Solution:\n");
     runSolution(solutionTrivialParallel);
+
+    printf("\n+-----------------------------+\n");
     printf("Atomic Parallel Solution:\n");
     runSolution(solutionAtomicParallel);
+
+    printf("\n+-----------------------------+\n");
     printf("Parallel Solution with critical section:\n");
     runSolution(solutionCriticalParallel);
+
+    printf("\n+-----------------------------+\n");
     printf("Parallel Solution with critical section and circular mine:\n");
     runSolution(solutionCriticalParallelCircular);
+
+    printf("\n+-----------------------------+\n");
     printf("Parallel Comb Solution:\n");
     runSolution(solutionCombParallel);
 
