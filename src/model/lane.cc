@@ -26,13 +26,8 @@ void Lane::transport() {
     this->consumedPower += powerConsumption;
 
     // transport rock amount
-    source.setRockAmount(
-        source.getRockAmount() - 1
-    );
-
-    target.setRockAmount(
-        target.getRockAmount() + 1
-    );
+    source.decrementRockAmount();
+    target.incrementRockAmount();
 
     // switch bogies
     int tmpBogieId = source.getBogieId();

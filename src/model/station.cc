@@ -22,4 +22,12 @@ void Station::setRockAmount(Real rockAmount) {
     this->rockAmount = rockAmount;
 }
 
+void Station::incrementRockAmount() {
+    this->rockAmount++;
+}
+
+void Station::decrementRockAmount() {
+    this->rockAmount--;
+}
+
 }    // namespace

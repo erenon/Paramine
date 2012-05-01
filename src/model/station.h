@@ -7,7 +7,7 @@ namespace Model {
 
 class Station {
 
-private:
+protected:
     int bogieId;
     Real rockAmount;
 
@@ -19,6 +19,9 @@ public:
 
     Real getRockAmount() const;
     void setRockAmount(Real rockAmount);
+
+    void incrementRockAmount();
+    void decrementRockAmount();
 };
 
 }    // namespace
