@@ -30,7 +30,7 @@ using Model::SolutionResult;
 using Model::DirectionFactory::AlwaysUp;
 
 SolutionResult solutionTrivial() {
-    AlwaysUp directionFactory;
+    DirFac directionFactory;
     Mine<Station, Lane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
     SolutionResult result(STATION_COUNT, LANE_COUNT);
 
@@ -61,7 +61,7 @@ SolutionResult solutionTrivial() {
 }
 
 SolutionResult solutionTrivialParallel() {
-    AlwaysUp directionFactory;
+    DirFac directionFactory;
     Mine<Station, Lane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
     SolutionResult result(STATION_COUNT, LANE_COUNT);
 
@@ -94,7 +94,7 @@ SolutionResult solutionTrivialParallel() {
 }
 
 SolutionResult solutionAtomicParallel() {
-    AlwaysUp directionFactory;
+    DirFac directionFactory;
     Mine<AtomicStation, AtomicLane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
     SolutionResult result(STATION_COUNT, LANE_COUNT);
 
@@ -127,7 +127,7 @@ SolutionResult solutionAtomicParallel() {
 }
 
 SolutionResult solutionCriticalParallel() {
-    AlwaysUp directionFactory;
+    DirFac directionFactory;
     Mine<Station, CriticalLane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
     SolutionResult result(STATION_COUNT, LANE_COUNT);
 
@@ -160,7 +160,7 @@ SolutionResult solutionCriticalParallel() {
 }
 
 SolutionResult solutionCriticalParallelCircular() {
-    AlwaysUp directionFactory;
+    DirFac directionFactory;
     int laneCount = LANE_COUNT + 1; // circular topology
     Mine<Station, CriticalLane> mine(STATION_COUNT, laneCount, ROCK_AMOUNT, directionFactory);
     SolutionResult result(STATION_COUNT, laneCount);
@@ -194,7 +194,7 @@ SolutionResult solutionCriticalParallelCircular() {
 }
 
 SolutionResult solutionCombParallel() {
-    AlwaysUp directionFactory;
+    DirFac directionFactory;
     Mine<Station, Lane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
     SolutionResult result(STATION_COUNT, LANE_COUNT);
 

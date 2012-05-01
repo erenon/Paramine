@@ -1,7 +1,15 @@
 #ifndef SRC_MODEL_CONSTANTS_H_
 #define SRC_MODEL_CONSTANTS_H_
 
+#include "direction_factory/always_up.h"
+#include "direction_factory/random.h"
+
+using Model::DirectionFactory::AlwaysUp;
+using Model::DirectionFactory::Random;
+
 typedef float Real;
+//typedef AlwaysUp DirFac;
+typedef Random DirFac;
 
 #define STATION_COUNT 5
 #define LANE_COUNT 4
