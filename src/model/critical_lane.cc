@@ -1,6 +1,7 @@
 #include "critical_lane.h"
 
 #include <cmath>
+#include <omp.h>
 
 namespace Model {
 
@@ -10,7 +11,8 @@ CriticalLane::CriticalLane(Station& stationLower, Station& stationUpper, IDirect
 }
 
 void CriticalLane::transport() {
-    bool direction = this->directionFactory.getDirection();
+    int threadId = omp_get_thread_num();
+    bool direction = this->directionFactory.getThreadsafeDirection(threadId);
     Station& source = (direction) ? this->stationLower : this->stationUpper;
     Station& target = (direction) ? this->stationUpper : this->stationLower;
 

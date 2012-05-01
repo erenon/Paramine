@@ -8,6 +8,7 @@ namespace Model { namespace DirectionFactory {
 class AlwaysUp :public IDirectionFactory {
 public:
     bool getDirection();
+    bool getThreadsafeDirection(int threadId);
     virtual ~AlwaysUp() {}
 };
 

@@ -6,10 +6,13 @@
 namespace Model { namespace DirectionFactory {
 
 class Random :public IDirectionFactory {
+private:
+    unsigned int* threadState;
 public:
     Random();
     bool getDirection();
-    virtual ~Random() {}
+    bool getThreadsafeDirection(int threadId);
+    virtual ~Random();
 };
 
 }}  // namespace

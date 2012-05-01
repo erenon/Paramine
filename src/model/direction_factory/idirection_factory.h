@@ -11,6 +11,7 @@ namespace Model { namespace DirectionFactory {
 class IDirectionFactory {
 public:
     virtual bool getDirection() = 0;
+    virtual bool getThreadsafeDirection(int threadId) = 0;
     virtual ~IDirectionFactory() {}
 };
 

@@ -1,6 +1,7 @@
 #include "lane.h"
 
 #include <cmath>
+#include <omp.h>
 
 namespace Model {
 
@@ -17,7 +18,8 @@ Real Lane::getConsumedPower() {
 }
 
 void Lane::transport() {
-    bool direction = this->directionFactory.getDirection();
+    int threadId = omp_get_thread_num();
+    bool direction = this->directionFactory.getThreadsafeDirection(threadId);
     Station& source = (direction) ? this->stationLower : this->stationUpper;
     Station& target = (direction) ? this->stationUpper : this->stationLower;
 

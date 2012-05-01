@@ -6,4 +6,8 @@ bool AlwaysUp::getDirection() {
     return true;
 }
 
+bool AlwaysUp::getThreadsafeDirection(int threadId) {
+    return true;
+}
+
 }}  // namespace
