@@ -20,6 +20,7 @@ public:
     Lane(Station& stationLower, Station& stationUpper, IDirectionFactory& directionFactory);
     Real getConsumedPower();
     void transport();
+    virtual ~Lane() {}
 };
 
 }   // namespace

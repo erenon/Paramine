@@ -230,6 +230,40 @@ SolutionResult solutionLockParallel() {
     return result;
 }
 
+SolutionResult solutionLockParallelCircular() {
+    DirFac directionFactory;
+    int laneCount = LANE_COUNT + 1; // circular topology
+    Mine<LockStation, LockLane> mine(STATION_COUNT, laneCount, ROCK_AMOUNT, directionFactory);
+    SolutionResult result(STATION_COUNT, laneCount);
+
+    result.startComputing();
+
+    int i;
+    #pragma omp parallel for default(none) shared(mine, laneCount) private(i)
+    for (i = 0; i < TOTAL_SWITCH_COUNT; i++) {
+        mine.getLaneAt(i%laneCount).transport();
+    }
+
+    result.stopComputing();
+
+    for (int i = 0; i < STATION_COUNT; i++) {
+        result.setStationResultAt(
+            i,
+            mine.getStationAt(i).getBogieId(),
+            mine.getStationAt(i).getRockAmount()
+        );
+    }
+
+    for (int i = 0; i < laneCount; i++) {
+        result.setLaneResultAt(
+            i,
+            mine.getLaneAt(i).getConsumedPower()
+        );
+    }
+
+    return result;
+}
+
 
 SolutionResult solutionCombParallel() {
     DirFac directionFactory;
@@ -293,7 +327,7 @@ void runSolution(SolutionResult(*solution)()) {
 }
 
 int main(void) {
-    /*printf("Trivial Solution:\n");
+    printf("Trivial Solution:\n");
     runSolution(solutionTrivial);
 
     printf("\n+-----------------------------+\n");
@@ -310,11 +344,15 @@ int main(void) {
 
     printf("\n+-----------------------------+\n");
     printf("Parallel Solution with critical section and circular mine:\n");
-    runSolution(solutionCriticalParallelCircular);*/
+    runSolution(solutionCriticalParallelCircular);
 
     printf("\n+-----------------------------+\n");
     printf("Parallel Solution with lockable stations:\n");
     runSolution(solutionLockParallel);
+
+    printf("\n+-----------------------------+\n");
+    printf("Parallel Solution with lockable stations and circular mine:\n");
+    runSolution(solutionLockParallelCircular);
 
     printf("\n+-----------------------------+\n");
     printf("Parallel Comb Solution:\n");

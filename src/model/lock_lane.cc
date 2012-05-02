@@ -7,7 +7,9 @@ namespace Model {
 
 LockLane::LockLane(LockStation& stationLower, LockStation& stationUpper, IDirectionFactory& directionFactory)
     :Lane(stationLower, stationUpper, directionFactory)
-{}
+{
+    omp_init_lock(&laneLock);
+}
 
 void LockLane::transport() {
     int threadId = omp_get_thread_num();
@@ -22,7 +24,7 @@ void LockLane::transport() {
     Real powerConsumption = log(sqrt(source.getRockAmount() / 2));
     this->consumedPower += powerConsumption;
 
-
+    omp_set_lock(&laneLock);
     omp_set_lock(&source.stationLock);
     omp_set_lock(&target.stationLock);
 
@@ -35,8 +37,13 @@ void LockLane::transport() {
     source.setBogieId(target.getBogieId());
     target.setBogieId(tmpBogieId);
 
-    omp_unset_lock(&source.stationLock);
     omp_unset_lock(&target.stationLock);
+    omp_unset_lock(&source.stationLock);
+    omp_unset_lock(&laneLock);
+}
+
+LockLane::~LockLane() {
+    omp_destroy_lock(&laneLock);
 }
 
 }   // namespace

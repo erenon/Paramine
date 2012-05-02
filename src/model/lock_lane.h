@@ -15,8 +15,11 @@ using ::Model::DirectionFactory::IDirectionFactory;
 
 class LockLane :public Lane {
 public:
+    omp_lock_t laneLock;
+
     LockLane(LockStation& stationLower, LockStation& stationUpper, IDirectionFactory& directionFactory);
     void transport();
+    ~LockLane();
 };
 
 }
