@@ -16,6 +16,8 @@
 #include "model/atomic_station.h"
 #include "model/atomic_lane.h"
 #include "model/critical_lane.h"
+#include "model/lock_station.h"
+#include "model/lock_lane.h"
 #include "model/direction_factory/always_up.h"
 #include "model/solution_result.h"
 
@@ -25,6 +27,8 @@ using Model::Lane;
 using Model::AtomicStation;
 using Model::AtomicLane;
 using Model::CriticalLane;
+using Model::LockStation;
+using Model::LockLane;
 using Model::SolutionResult;
 
 using Model::DirectionFactory::AlwaysUp;
@@ -193,6 +197,40 @@ SolutionResult solutionCriticalParallelCircular() {
     return result;
 }
 
+SolutionResult solutionLockParallel() {
+    DirFac directionFactory;
+    Mine<LockStation, LockLane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
+    SolutionResult result(STATION_COUNT, LANE_COUNT);
+
+    result.startComputing();
+
+    int i;
+    #pragma omp parallel for default(none) shared(mine) private(i)
+    for (i = 0; i < TOTAL_SWITCH_COUNT; i++) {
+        mine.getLaneAt(i%LANE_COUNT).transport();
+    }
+
+    result.stopComputing();
+
+    for (int i = 0; i < STATION_COUNT; i++) {
+        result.setStationResultAt(
+            i,
+            mine.getStationAt(i).getBogieId(),
+            mine.getStationAt(i).getRockAmount()
+        );
+    }
+
+    for (int i = 0; i < LANE_COUNT; i++) {
+        result.setLaneResultAt(
+            i,
+            mine.getLaneAt(i).getConsumedPower()
+        );
+    }
+
+    return result;
+}
+
+
 SolutionResult solutionCombParallel() {
     DirFac directionFactory;
     Mine<Station, Lane> mine(STATION_COUNT, LANE_COUNT, ROCK_AMOUNT, directionFactory);
@@ -255,7 +293,7 @@ void runSolution(SolutionResult(*solution)()) {
 }
 
 int main(void) {
-    printf("Trivial Solution:\n");
+    /*printf("Trivial Solution:\n");
     runSolution(solutionTrivial);
 
     printf("\n+-----------------------------+\n");
@@ -272,7 +310,11 @@ int main(void) {
 
     printf("\n+-----------------------------+\n");
     printf("Parallel Solution with critical section and circular mine:\n");
-    runSolution(solutionCriticalParallelCircular);
+    runSolution(solutionCriticalParallelCircular);*/
+
+    printf("\n+-----------------------------+\n");
+    printf("Parallel Solution with lockable stations:\n");
+    runSolution(solutionLockParallel);
 
     printf("\n+-----------------------------+\n");
     printf("Parallel Comb Solution:\n");
