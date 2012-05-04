@@ -24,9 +24,13 @@ void LockLane::transport() {
     Real powerConsumption = log(sqrt(source.getRockAmount() / 2));
     this->consumedPower += powerConsumption;
 
-    omp_set_lock(&laneLock);
-    omp_set_lock(&source.stationLock);
-    omp_set_lock(&target.stationLock);
+    bool lockSourceFirst = source.getId() < target.getId();
+    LockStation& firstToLock = (lockSourceFirst) ? source : target;
+    LockStation& secondToLock = (lockSourceFirst) ? target : source;
+
+    //omp_set_lock(&laneLock);
+    omp_set_lock(&firstToLock.stationLock);
+    omp_set_lock(&secondToLock.stationLock);
 
     // transport rock amount
     source.decrementRockAmount();
@@ -37,9 +41,9 @@ void LockLane::transport() {
     source.setBogieId(target.getBogieId());
     target.setBogieId(tmpBogieId);
 
-    omp_unset_lock(&target.stationLock);
-    omp_unset_lock(&source.stationLock);
-    omp_unset_lock(&laneLock);
+    omp_unset_lock(&secondToLock.stationLock);
+    omp_unset_lock(&firstToLock.stationLock);
+    //omp_unset_lock(&laneLock);
 }
 
 LockLane::~LockLane() {

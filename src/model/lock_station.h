@@ -10,10 +10,15 @@ namespace Model {
 using ::Model::Station;
 
 class LockStation :public Station {
+protected:
+    static int idPool;
+    int id;
+
 public:
     omp_lock_t stationLock;
 
     LockStation(int bogieId, Real rockAmount);
+    int getId();
     virtual ~LockStation();
 };
 
